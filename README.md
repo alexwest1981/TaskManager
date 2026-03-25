@@ -1,0 +1,86 @@
+# Svelte Task Manager 🚀
+
+En modern och responsiv att-göra-applikation byggd med de senaste webbteknologierna. Projektet fokuserar på snabbhet, användarvänlighet och ett stilrent gränssnitt med stöd för både ljust och mörkt läge.
+
+## ✨ Funktioner
+
+- **Drag-and-Drop**: Omorganisera dina uppgifter enkelt genom att dra och släppa (tack vare `svelte-dnd-action`).
+- **Sökning & Filtrering**: Hitta specifika uppgifter snabbt eller filtrera baserat på status (Alla, Aktiva, Klara).
+- **Mörkt Läge**: Fullt stöd för mörkt läge som sparas i webbläsaren.
+- **Progress-indikator**: Se i realtid hur stor del av dina projektuppgifter som är slutförda.
+- **Persistent Lagring**: Alla uppgifter sparas i en SQLite-databas via Drizzle ORM.
+- **Svelte 5 Runes**: Utnyttjar de senaste reaktiva mönstren i Svelte (`$state`, `$derived`, `$effect`).
+
+## 🛠 Teknisk Stack
+
+- **Framework**: [SvelteKit 2.x](https://kit.svelte.dev/) & [Svelte 5](https://svelte.dev/)
+- **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com/)
+- **Databas**: [SQLite](https://sqlite.org/) via [LibSQL](https://turso.tech/libsql)
+- **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+
+## 🚀 Kom igång
+
+### Förutsättningar
+
+- [Node.js](https://nodejs.org/) (version 20 eller senare rekommenderas)
+- npm (eller pnpm/yarn)
+
+### Installation
+
+1. Klona repositoryt (om relevant) eller navigera till mappen.
+2. Installera beroenden:
+   ```bash
+   npm install
+   ```
+
+### Databas-setup
+
+Innan du startar appen behöver du initiera databasen:
+
+```bash
+# Generera migrations
+npm run db:generate
+
+# Pusha tabell-strukturen till din lokala local.db
+npm run db:push
+```
+
+### Utveckling
+
+Starta utvecklingsservern:
+
+```bash
+npm run dev
+
+# Eller starta och öppna i webbläsaren direkt
+npm run dev -- --open
+```
+
+## 📦 Bygge och Produktionssättning
+
+För att skapa en optimerad produktionsversion:
+
+```bash
+npm run build
+```
+
+Du kan förhandsgranska bygget lokalt med:
+
+```bash
+npm run preview
+```
+
+## 📜 Skript-referens
+
+- `npm run dev`: Startar Vite i utvecklingsläge.
+- `npm run build`: Bygger för produktion.
+- `npm run check`: Kör typtestning med `svelte-check`.
+- `npm run lint`: Kör Prettier och ESLint.
+- `npm run format`: Formaterar koden med Prettier.
+- `npm run db:push`: Synkar Drizzle-schemat direkt till databasen.
+- `npm run db:studio`: Öppnar Drizzle Studio för att inspektera datan visuellt.
+
+---
+
+Skapad med ❤️ med Svelte 5.
