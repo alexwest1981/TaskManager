@@ -4,6 +4,11 @@ En modern och responsiv att-göra-applikation byggd med de senaste webbteknologi
 
 ## ✨ Funktioner
 
+- **Premium Binder UI**: Ett taktilt, mapp-inspirerat gränssnitt som känns som en fysisk pärm.
+- **🎙️ Röststyrning**: Lägg till uppgifter genom att prata direkt till appen (Web Speech API).
+- **📅 Kalendervy**: En visuell månadskalender som mappar dina uppgifter mot datum.
+- **☀️ Realtidsväder**: Integrerad väderprognos och klocka för bättre tidskontext.
+- **📝 Sticky Notes**: Snabba digitala kom-ihåg-lappar direkt i pärmen.
 - **Drag-and-Drop**: Omorganisera dina uppgifter enkelt genom att dra och släppa (tack vare `svelte-dnd-action`).
 - **Sökning & Filtrering**: Hitta specifika uppgifter snabbt eller filtrera baserat på status (Alla, Aktiva, Klara).
 - **Mörkt Läge**: Fullt stöd för mörkt läge som sparas i webbläsaren.
