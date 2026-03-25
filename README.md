@@ -17,6 +17,8 @@ En modern och responsiv att-göra-applikation byggd med de senaste webbteknologi
 - **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com/)
 - **Databas**: [SQLite](https://sqlite.org/) via [LibSQL](https://turso.tech/libsql)
 - **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
+- **API**: [Open-Meteo](https://open-meteo.com/) (Väder)
+- **Web APIs**: Web Speech API (Röststyrning)
 - **Build Tool**: [Vite](https://vitejs.dev/)
 
 ## 🚀 Kom igång

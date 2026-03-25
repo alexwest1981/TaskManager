@@ -1,42 +1,91 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { enhance } from '$app/forms';
 	import { fade } from 'svelte/transition';
 	import { dndzone } from 'svelte-dnd-action';
 	import { invalidateAll } from '$app/navigation';
 	import { flip } from 'svelte/animate';
+	
+	import TaskItem from '$lib/components/TaskItem.svelte';
+	import TaskForm from '$lib/components/TaskForm.svelte';
+	import Pagination from '$lib/components/Pagination.svelte';
+	import StatsModal from '$lib/components/StatsModal.svelte';
+	import ActivityLog from '$lib/components/ActivityLog.svelte';
+	import AboutView from '$lib/components/AboutView.svelte';
+	import WeatherWidget from '$lib/components/WeatherWidget.svelte';
+	import StickyNote from '$lib/components/StickyNote.svelte';
+	import CalendarView from '$lib/components/CalendarView.svelte';
+	import type { Task, Activity } from '$lib/types';
+	import { exportTasks, importTasks } from '$lib/utils/tasks';
 
-	let { data } = $props();
+	let { data }: { data: { tasks: Task[], activities: Activity[] } } = $props();
 	const flipDurationMs = 300;
 
-	// --- REAKTIVT TILLSTÅND ---
 	let searchTerm = $state('');
 	let filterStatus = $state<'all' | 'active' | 'done'>('all');
-	let localTasks = $state([...data.tasks]);
+	/* svelte-ignore state_referenced_locally */
+	let localTasks = $state(data.tasks);
 	let isDark = $state(false);
+	let showStats = $state(false);
+	let taskPriority = $state<'low' | 'medium' | 'high'>('medium');
+	let currentPage = $state(1);
+	const itemsPerPage = 5;
+	let activeFolder = $state('Alla');
+	let activeTab = $state<'tasks' | 'about' | 'calendar'>('tasks');
+	let stickyNotes = $state<string[]>(['Välkommen till din nya pärm! 📁', 'Klicka för att ändra mig...']);
 
-	// Synka lokal lista när databasen ändras (t.ex. vid Add/Delete)
-	$effect(() => { localTasks = [...data.tasks]; });
+	let categories = $derived([...new Set(localTasks.map(t => t.category || 'Övrigt'))].sort());
+	let folders = $derived(['Alla', ...categories]);
 
-	// Filtrering (Realtid)
+	$effect(() => { localTasks = data.tasks; });
+	
+	onMount(() => {
+		const saved = localStorage.getItem('sticky_notes');
+		if (saved) stickyNotes = JSON.parse(saved);
+	});
+
+	$effect(() => {
+		localStorage.setItem('sticky_notes', JSON.stringify(stickyNotes));
+	});
+
 	let filteredTasks = $derived(
 		localTasks.filter(t => {
+			const matchesFolder = activeFolder === 'Alla' || (t.category || 'Övrigt') === activeFolder;
 			const matchesSearch = t.text.toLowerCase().includes(searchTerm.toLowerCase());
-			if (filterStatus === 'active') return matchesSearch && !t.done;
-			if (filterStatus === 'done') return matchesSearch && t.done;
-			return matchesSearch;
+			
+			let matchesStatus = true;
+			if (filterStatus === 'active') matchesStatus = !t.done;
+			else if (filterStatus === 'done') matchesStatus = t.done;
+
+			return matchesFolder && matchesSearch && matchesStatus;
 		})
 	);
 
-	// Statistik
+	let totalPages = $derived(Math.max(1, Math.ceil(filteredTasks.length / itemsPerPage)));
+	let paginatedTasks = $derived(filteredTasks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage));
+
 	let total = $derived(localTasks.length);
 	let completed = $derived(localTasks.filter(t => t.done).length);
 	let progress = $derived(total === 0 ? 0 : Math.round((completed / total) * 100));
 
-	// --- FUNKTIONER ---
-	function handleDndConsider(e: CustomEvent<any>) { localTasks = e.detail.items; }
+	let stats = $derived({
+		active: total - completed,
+		oldestActive: localTasks.filter(t => !t.done).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))[0],
+		avgAge: localTasks.filter(t => !t.done).length ? Math.round(localTasks.filter(t => !t.done).reduce((acc, t) => acc + (Date.now() - (t.createdAt || Date.now())), 0) / localTasks.filter(t => !t.done).length / (1000 * 60)) : 0,
+		byPriority: { high: localTasks.filter(t => t.priority === 'high').length, medium: localTasks.filter(t => t.priority === 'medium').length, low: localTasks.filter(t => t.priority === 'low').length }
+	});
 
-	async function handleDndFinalize(e: CustomEvent<any>) {
+	function timeAgo(ms: number | null) {
+		if (!ms) return 'nyss';
+		const diff = Date.now() - ms;
+		const mins = Math.floor(diff / (1000 * 60));
+		const hours = Math.floor(mins / 60);
+		if (hours > 0) return `${hours}h sedan`;
+		if (mins > 0) return `${mins}m sedan`;
+		return 'nyss';
+	}
+
+	function handleDndConsider(e: CustomEvent<{ items: Task[] }>) { localTasks = e.detail.items; }
+	async function handleDndFinalize(e: CustomEvent<{ items: Task[] }>) {
 		localTasks = e.detail.items;
 		const ids = localTasks.map(t => t.id);
 		const formData = new FormData();
@@ -45,23 +94,10 @@
 		await invalidateAll();
 	}
 
-	function handleCheck(e: Event) {
-		(e.target as HTMLInputElement).form?.requestSubmit();
-	}
-
-	function toggleTheme() {
-		isDark = !isDark;
-		applyTheme();
-	}
-
+	function toggleTheme() { isDark = !isDark; applyTheme(); }
 	function applyTheme() {
-		if (isDark) {
-			document.documentElement.classList.add('dark');
-			localStorage.setItem('theme', 'dark');
-		} else {
-			document.documentElement.classList.remove('dark');
-			localStorage.setItem('theme', 'light');
-		}
+		if (isDark) { document.documentElement.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
+		else { document.documentElement.classList.remove('dark'); localStorage.setItem('theme', 'light'); }
 	}
 
 	onMount(() => {
@@ -69,114 +105,178 @@
 		isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
 		applyTheme();
 	});
+
+	async function handleImport(e: Event) {
+		const file = (e.target as HTMLInputElement).files?.[0];
+		if (!file) return;
+		try { const tasksToImport = await importTasks(file); alert(`Hittade ${tasksToImport.length} uppgifter.`); }
+		catch { alert('Kunde inte läsa filen.'); }
+	}
 </script>
 
-<div class="min-h-screen bg-slate-100 dark:bg-slate-950 transition-colors duration-500 py-10 px-4">
-	<main class="max-w-2xl mx-auto p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl transition-colors duration-500">
-
-		<section class="mb-8 bg-slate-50 dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
-			<div class="flex justify-between items-start mb-6">
-				<div>
-					<h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Project Tasks</h1>
-					<p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Status: <span class="text-blue-500 font-bold">Live Demo</span></p>
-				</div>
-				<button
-					type="button"
-					onclick={() => toggleTheme()}
-					class="p-3 rounded-xl bg-white dark:bg-slate-700 shadow-sm border border-slate-200 dark:border-slate-600 hover:scale-110 transition-all text-xl"
-				>
-					{isDark ? '☀️' : '🌙'}
+<div class="min-h-screen pt-10 pb-20 px-4 md:px-8">
+	<div class="max-w-7xl mx-auto flex items-start">
+		
+		<!-- Left Side Tabs (Folder Labels) -->
+		<aside class="hidden lg:flex flex-col gap-1 pt-12 z-20 max-h-[90vh] overflow-y-auto no-scrollbar pr-0 relative mr-[-1px]">
+			{#each folders as folder (folder)}
+				<button 
+					onclick={() => { activeFolder = folder; activeTab = 'tasks'; }}
+					class="folder-tab {activeTab === 'tasks' && activeFolder === folder ? 'folder-tab-active' : 'folder-tab-inactive'}">
+					<span class="folder-tab-label">{folder}</span>
 				</button>
-			</div>
-
-			<div class="flex justify-between items-center mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-				<span>Progress</span>
-				<span class="text-blue-500">{progress}%</span>
-			</div>
-			<div class="w-full bg-slate-200 dark:bg-slate-700 h-3 rounded-full overflow-hidden">
-				<div class="bg-blue-500 h-full transition-all duration-1000 ease-out" style="width: {progress}%"></div>
-			</div>
-		</section>
-
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-			<input
-				bind:value={searchTerm}
-				placeholder="Search tasks..."
-				class="p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 ring-blue-500 outline-none transition-all"
-			/>
-			<div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
-				{#each ['all', 'active', 'done'] as status}
-					<button
-						onclick={() => filterStatus = status as any}
-						class="flex-1 py-2 rounded-md text-xs font-bold capitalize transition-all {filterStatus === status ? 'bg-white dark:bg-slate-600 shadow-sm text-blue-600 dark:text-white' : 'text-slate-400 hover:text-slate-600'}"
-					>
-						{status}
-					</button>
-				{/each}
-			</div>
-		</div>
-
-		<form method="POST" action="?/add" use:enhance class="flex gap-2 mb-8">
-			<input
-				name="text"
-				required
-				placeholder="Add new task..."
-				class="flex-1 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-blue-500"
-			/>
-			<button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-colors shadow-lg shadow-blue-500/20">
-				Add
-			</button>
-		</form>
-
-		<ul
-			use:dndzone={{
-    items: filteredTasks,
-    flipDurationMs,
-    dropTargetStyle: { outline: 'none' }
-  }}
-			onconsider={handleDndConsider}
-			onfinalize={handleDndFinalize}
-			class="space-y-3 min-h-[50px]"
-		>
-			{#each filteredTasks as task (task.id)}
-				<li
-					animate:flip={{ duration: flipDurationMs }}
-					class="group flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing"
-				>
-					<form method="POST" action="?/toggle" use:enhance class="flex">
-						<input type="hidden" name="id" value={task.id} />
-						<input type="hidden" name="done" value={task.done} />
-						<input type="checkbox" checked={task.done} onchange={handleCheck} class="w-6 h-6 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-0 cursor-pointer" />
-					</form>
-
-					<span class="flex-1 font-medium transition-colors {task.done ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200'}">
-						{task.text}
-					</span>
-
-					<form method="POST" action="?/delete" use:enhance>
-						<input type="hidden" name="id" value={task.id} />
-						<button class="opacity-0 group-hover:opacity-100 p-2 text-slate-400 hover:text-red-500 transition-all">🗑️</button>
-					</form>
-				</li>
 			{/each}
-		</ul>
 
-		{#if filteredTasks.length === 0}
-			<div class="text-center py-12 text-slate-400 italic" in:fade>
-				No tasks found...
+			<div class="h-8"></div>
+
+			<button 
+				onclick={() => activeTab = 'about'}
+				class="folder-tab {activeTab === 'about' ? 'folder-tab-active' : 'folder-tab-inactive'}">
+				<span class="folder-tab-label">Project Info</span>
+			</button>
+
+			<button 
+				onclick={() => activeTab = 'calendar'}
+				class="folder-tab {activeTab === 'calendar' ? 'folder-tab-active' : 'folder-tab-inactive'}">
+				<span class="folder-tab-label">Kalender</span>
+			</button>
+		</aside>
+
+		<!-- Main Page (Folder Content) -->
+		<main class="flex-1 folder-main p-6 md:p-10 min-h-[700px] z-10 relative">
+			<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 pb-6 border-b border-slate-100 dark:border-slate-800/50">
+				<div>
+					<h1 class="text-4xl text-bold-heavy tracking-tighter">TaskManager</h1>
+					<p class="opacity-60 text-xs font-bold uppercase tracking-widest mt-1">Organisera mera • 2026</p>
+				</div>
+				<div class="flex gap-3">
+					<button onclick={() => showStats = true} class="premium-button flex items-center gap-2">📊 Stats</button>
+					<button onclick={toggleTheme} class="premium-button text-xl px-2.5">{isDark ? '☀️' : '🌙'}</button>
+				</div>
+			</header>
+
+			<!-- Mobile Tabs -->
+			<div class="lg:hidden flex flex-col gap-4 mb-8">
+				<div class="flex interactive-surface p-1 w-fit overflow-x-auto no-scrollbar">
+					{#each ['tasks', 'calendar', 'about'] as tab (tab)}
+						<button 
+							onclick={() => activeTab = tab as 'tasks' | 'calendar' | 'about'} 
+							class="px-6 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap {activeTab === tab ? 'bg-white dark:bg-slate-700 shadow-md text-blue-600 dark:text-white' : 'text-slate-500 dark:text-slate-400'}"
+						>
+							{#if tab === 'tasks'}Uppgifter{:else if tab === 'calendar'}Kalender{:else}Info{/if}
+						</button>
+					{/each}
+				</div>
+
+				{#if activeTab === 'tasks'}
+					<div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+						{#each folders as folder (folder)}
+							<button 
+								onclick={() => activeFolder = folder}
+								class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all
+								{activeFolder === folder ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700'}"
+							>
+								{folder}
+							</button>
+						{/each}
+					</div>
+				{/if}
 			</div>
-		{/if}
-		<footer class="mt-12 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[10px] uppercase tracking-widest font-bold text-slate-400 dark:text-slate-500">
-			<div class="flex items-center gap-2">
-				<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-				System Stable
-			</div>
+
+			{#if activeTab === 'tasks'}
+				<div in:fade={{ duration: 300 }}>
+					<TaskForm bind:taskPriority />
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
+						<div class="interactive-surface flex items-center px-4 py-3 group focus-within:ring-2 ring-blue-500/20">
+							<span class="mr-3 opacity-40">🔍</span>
+							<input bind:value={searchTerm} placeholder="Sök bland dina uppgifter..." class="bg-transparent border-none outline-none w-full text-sm font-medium" />
+						</div>
+						<div class="interactive-surface flex p-1">
+							{#each ['all', 'active', 'done'] as status (status)}
+								<button onclick={() => filterStatus = status as 'all' | 'active' | 'done'} class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all {filterStatus === status ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white' : 'opacity-50 hover:opacity-100'}">{status}</button>
+							{/each}
+						</div>
+					</div>
+
+					<ul use:dndzone={{ items: paginatedTasks, flipDurationMs }} onconsider={handleDndConsider} onfinalize={handleDndFinalize} class="space-y-4">
+						{#each paginatedTasks as task (task.id)}
+							<div animate:flip={{ duration: flipDurationMs }}>
+								<TaskItem {task} />
+							</div>
+						{/each}
+					</ul>
+
+					<div class="mt-12 flex justify-center">
+						<Pagination bind:currentPage {totalPages} />
+					</div>
+				</div>
+			{:else if activeTab === 'calendar'}
+				<div in:fade={{ duration: 300 }}>
+					<CalendarView tasks={localTasks} />
+				</div>
+			{:else}
+				<div in:fade={{ duration: 300 }}>
+					<AboutView onBack={() => activeTab = 'tasks'} />
+				</div>
+			{/if}
+		</main>
+
+		<!-- Activity & Sticky Notes Sidebar -->
+		<aside class="hidden xl:flex flex-col gap-16 w-80 sticky top-10 ml-16">
+			<WeatherWidget />
+
 			<div>
-				v1.2.4-stable // March 2026
+				<h3 class="text-[10px] font-black uppercase tracking-[0.25em] opacity-30 mb-8 ml-1">Aktivitetslogg</h3>
+				<ActivityLog activities={data.activities} />
 			</div>
-			<span class="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] ml-2">
-  			SVELTE 5 READY
-			</span>
-		</footer>
-	</main>
+			
+			<div>
+				<div class="flex justify-between items-center mb-6 px-1">
+					<h3 class="text-[10px] font-black uppercase tracking-[0.25em] opacity-30 flex items-center gap-2">
+						Sticky Notes
+					</h3>
+					<button 
+						onclick={() => stickyNotes = [...stickyNotes, '']}
+						class="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center text-[10px] font-black hover:scale-110 transition-transform shadow-sm"
+					>
+						+
+					</button>
+				</div>
+				
+				<div class="flex flex-wrap gap-4">
+					{#each stickyNotes as note, i (i)}
+						<StickyNote 
+							{note} 
+							onUpdate={(val) => stickyNotes[i] = val} 
+							onDelete={() => stickyNotes = stickyNotes.filter((_, idx) => idx !== i)} 
+						/>
+					{/each}
+				</div>
+			</div>
+
+			<div class="premium-card p-6 border-l-4 border-l-blue-600 shadow-xl opacity-90">
+				<h3 class="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 mb-4">Mål-uppfyllnad</h3>
+				<div class="flex items-baseline gap-1 mb-2">
+					<span class="text-4xl font-black text-bold-heavy">{progress}</span>
+					<span class="text-xs font-bold opacity-30">%</span>
+				</div>
+				<div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mb-4">
+					<div class="bg-blue-600 h-full transition-all duration-1000 ease-out" style="width: {progress}%"></div>
+				</div>
+				<p class="text-[9px] font-black uppercase tracking-widest opacity-30">{completed} av {total} avklarade</p>
+			</div>
+		</aside>
+	</div>
 </div>
+
+<StatsModal 
+	bind:show={showStats} 
+	{total} {completed} {stats} {timeAgo} 
+	onExport={() => exportTasks(localTasks)}
+	onImport={handleImport}
+/>
+
+<style>
+	:global(body) { overflow-x: hidden; }
+</style>

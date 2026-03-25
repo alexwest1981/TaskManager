@@ -3,8 +3,12 @@ import { createClient } from '@libsql/client';
 import * as schema from './schema';
 import { env } from '$env/dynamic/private';
 
-if (!env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
+import { appendFileSync } from 'node:fs';
+if (!env.DATABASE_URL) {
+	appendFileSync('/tmp/error.log', 'DB INIT ERROR: DATABASE_URL is not set\n');
+}
 
-const client = createClient({ url: env.DATABASE_URL });
+const url = env.DATABASE_URL || 'file:local.db';
+const client = createClient({ url });
 
 export const db = drizzle(client, { schema });
