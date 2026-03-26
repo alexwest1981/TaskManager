@@ -31,11 +31,11 @@
 		<article>
 			<h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700 dark:text-blue-400 mb-4 px-2 py-1 bg-blue-50 dark:bg-blue-900/20 w-fit rounded-md border border-blue-100 dark:border-blue-800/50">Huvudfunktioner</h3>
 			<div class="space-y-3 text-[14px] text-bold-heavy">
-				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 🎙️ Röstinmatning (Web Speech API)</p>
-				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 📅 Visuell Månadskalender</p>
-				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> ☀️ Realtidsklimat & Klocka</p>
-				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 📁 Premium Binder UI (Takilt gränssnitt)</p>
-				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 📝 Digitala 'Sticky Notes' för snabba råd</p>
+				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 📁 Folder Navigation (Flik-system)</p>
+				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 🤖 AI Briefing (Smart sammanfattning)</p>
+				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> ⏱️ Focus Session (Pomodoro-timer)</p>
+				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 📜 Aktivitetslogg & Historik</p>
+				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 🎙️ Röstinmatning & Väder-insikter</p>
 			</div>
 		</article>
 	</div>

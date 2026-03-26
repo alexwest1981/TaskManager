@@ -4,17 +4,29 @@ En modern och responsiv att-göra-applikation byggd med de senaste webbteknologi
 
 ## ✨ Funktioner
 
-- **Premium Binder UI**: Ett taktilt, mapp-inspirerat gränssnitt som känns som en fysisk pärm.
+- **Premium Binder UI**: Ett taktilt, mapp-inspirerat gränssnitt med ett avancerat flik-system för sömlös navigation.
+- **🤖 AI Briefing**: Dynamiska, reaktiva sammanfattningar av ditt läge byggda med Svelte 5 `$derived.by`.
+- **⏱️ Focus Session**: En inbyggd Pomodoro-timer med mekanisk estetik för fokuserat arbete.
+- **📜 Aktivitetslogg**: Fullständig historik över alla förändringar i din pärm för total kontroll.
 - **🎙️ Röststyrning**: Lägg till uppgifter genom att prata direkt till appen (Web Speech API).
 - **📅 Kalendervy**: En visuell månadskalender som mappar dina uppgifter mot datum.
 - **☀️ Realtidsväder**: Integrerad väderprognos och klocka för bättre tidskontext.
 - **📝 Sticky Notes**: Snabba digitala kom-ihåg-lappar direkt i pärmen.
-- **Drag-and-Drop**: Omorganisera dina uppgifter enkelt genom att dra och släppa (tack vare `svelte-dnd-action`).
-- **Sökning & Filtrering**: Hitta specifika uppgifter snabbt eller filtrera baserat på status (Alla, Aktiva, Klara).
-- **Mörkt Läge**: Fullt stöd för mörkt läge som sparas i webbläsaren.
-- **Progress-indikator**: Se i realtid hur stor del av dina projektuppgifter som är slutförda.
-- **Persistent Lagring**: Alla uppgifter sparas i en SQLite-databas via Drizzle ORM.
-- **Svelte 5 Runes**: Utnyttjar de senaste reaktiva mönstren i Svelte (`$state`, `$derived`, `$effect`).
+- **Drag-and-Drop**: Omorganisera dina uppgifter enkelt genom att dra och släppa.
+- **Mörkt Läge**: Fullt stöd för mörkt läge (System & Manual).
+- **Persistent Lagring**: SQLite-databas via Drizzle ORM.
+- **Svelte 5 Runes**: Utnyttjar `$state`, `$derived` och `$effect` för högpresterande reaktivitet.
+
+## 📝 Changelog
+
+### Version 1.1.0 (Nuvarande)
+- **Folder Migration**: Hela gränssnittet omstrukturerat till en "mapp-arkitektur" med sidoflikar.
+- **Productivity Suite**: Lagt till AI Briefing, Focus Session (Pomodoro) och Aktivitetslogg.
+- **Stability Fix**: Åtgärdat 500-fel relaterade till SSR och rensat upp i tunga "Sensory Suite"-moduler för bättre prestanda.
+- **UI Polish**: Expanderat "Sticky Notes" och optimerat sidofältet för större skärmar.
+
+### Version 1.0.0
+- Initial lansering med röststyrning, kalender och bas-prioritering.
 
 ## 🛠 Teknisk Stack
 

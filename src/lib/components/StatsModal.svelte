@@ -13,18 +13,90 @@
 		oldestActive: Task | null;
 	}
 
-	let { show = $bindable(), total, completed, stats, timeAgo, onExport, onImport }: { 
-		show: boolean, 
+	let { 
+		show = $bindable(false), 
+		total, 
+		completed, 
+		stats, 
+		timeAgo, 
+		onExport, 
+		onImport,
+		standalone = false
+	}: { 
+		show?: boolean, 
 		total: number, 
 		completed: number, 
 		stats: Stats,
 		timeAgo: (ms: number | null) => string,
 		onExport: () => void,
-		onImport: (e: Event) => void
+		onImport: (e: Event) => void,
+		standalone?: boolean
 	} = $props();
 </script>
 
-{#if show}
+{#if standalone}
+	<div class="max-w-2xl mx-auto py-10" in:fade>
+		<header class="flex justify-between items-center mb-10">
+			<h2 class="text-3xl font-black text-bold-heavy tracking-tighter">Statistik</h2>
+		</header>
+
+		<div class="grid grid-cols-2 gap-6 mb-12">
+			<div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-3xl border border-blue-100 dark:border-blue-800 shadow-sm">
+				<p class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">Totala Uppgifter</p>
+				<p class="text-4xl font-black text-slate-900 dark:text-white">{total}</p>
+			</div>
+			<div class="bg-green-50 dark:bg-green-900/20 p-6 rounded-3xl border border-green-100 dark:border-green-800 shadow-sm">
+				<p class="text-[10px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest mb-1">Klara Uppgifter</p>
+				<p class="text-4xl font-black text-slate-900 dark:text-white">{completed}</p>
+			</div>
+		</div>
+
+		<div class="space-y-6">
+			<div class="premium-card p-6 flex justify-between items-center">
+				<span class="text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-[0.2em]">Aktiva uppgifter</span>
+				<span class="font-black text-2xl text-slate-900 dark:text-white">{stats.active}</span>
+			</div>
+			
+			<div class="premium-card p-6">
+				<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 text-center">Fördelning per prioritet</p>
+				<div class="flex justify-around items-center">
+					<div class="flex flex-col items-center">
+						<span class="w-4 h-4 rounded-full bg-red-500 mb-2 shadow-lg shadow-red-500/20"></span>
+						<span class="text-sm font-black dark:text-white">{stats.byPriority.high}</span>
+					</div>
+					<div class="flex flex-col items-center">
+						<span class="w-4 h-4 rounded-full bg-amber-500 mb-2 shadow-lg shadow-amber-500/20"></span>
+						<span class="text-sm font-black dark:text-white">{stats.byPriority.medium}</span>
+					</div>
+					<div class="flex flex-col items-center">
+						<span class="w-4 h-4 rounded-full bg-green-500 mb-2 shadow-lg shadow-green-500/20"></span>
+						<span class="text-sm font-black dark:text-white">{stats.byPriority.low}</span>
+					</div>
+				</div>
+			</div>
+
+			{#if stats.oldestActive}
+				<div class="premium-card p-6 bg-amber-50/30 dark:bg-amber-900/10 border-amber-200/50">
+					<p class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-3">Äldsta aktiva uppgift</p>
+					<div class="flex justify-between items-center">
+						<span class="text-slate-900 dark:text-white font-bold text-lg">{stats.oldestActive.text}</span>
+						<span class="text-[10px] bg-white dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 px-3 py-1.5 rounded-lg font-black uppercase shadow-sm border border-amber-100 dark:border-amber-800">
+							{timeAgo(stats.oldestActive.createdAt)}
+						</span>
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-6">
+			<button onclick={onExport} class="premium-button py-4 text-[10px] uppercase font-black tracking-widest">📥 Exportera Data</button>
+			<label class="premium-button py-4 text-[10px] uppercase font-black tracking-widest cursor-pointer text-center">
+				📤 Importera Data
+				<input type="file" accept=".json" onchange={onImport} class="hidden" />
+			</label>
+		</div>
+	</div>
+{:else if show}
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
 		transition:fade={{ duration: 200 }}
@@ -33,8 +105,8 @@
 		onclick={() => show = false}
 		onkeydown={(e) => e.key === 'Escape' && (show = false)}
 	>
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			class="premium-card w-full max-w-md p-8 !bg-white dark:!bg-slate-900 border border-slate-200 dark:border-slate-800"
 			role="presentation"

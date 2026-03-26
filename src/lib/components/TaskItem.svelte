@@ -48,7 +48,15 @@
 	function autofocus(node: HTMLElement) { node.focus(); }
 </script>
 
-<li class="premium-card group flex items-center gap-4 p-5 cursor-grab active:cursor-grabbing">
+<li class="premium-card group flex items-center gap-4 p-5 cursor-grab active:cursor-grabbing relative overflow-hidden">
+	{#if task.priority === 'high' || task.text.toLowerCase().includes('http')}
+		<!-- Paper Clip Attachment Icon -->
+		<div class="absolute -top-1 -right-1 w-8 h-8 opacity-20 group-hover:opacity-100 transition-opacity pointer-events-none">
+			<svg viewBox="0 0 24 24" fill="none" class="w-full h-full text-slate-400 transform rotate-15">
+				<path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+			</svg>
+		</div>
+	{/if}
 	<form method="POST" action="?/toggle" use:enhance class="flex">
 		<input type="hidden" name="id" value={task.id} />
 		<input type="hidden" name="done" value={task.done} />
