@@ -13,6 +13,7 @@
 	import ActivityLog from '$lib/components/ActivityLog.svelte';
 	import WeatherWidget from '$lib/components/WeatherWidget.svelte';
 	import StickyNote from '$lib/components/StickyNote.svelte';
+	import PostItWall from '$lib/components/PostItWall.svelte';
 	import CalendarView from '$lib/components/CalendarView.svelte';
 	import PaperThemePicker from '$lib/components/PaperThemePicker.svelte';
 	import HabitTracker from '$lib/components/HabitTracker.svelte';
@@ -39,7 +40,7 @@
 	let currentPage = $state(1);
 	const itemsPerPage = 5;
 	let activeFolder = $state('Alla');
-	let activeTab = $state<'tasks' | 'about' | 'calendar' | 'habits' | 'stats' | 'briefing' | 'focus' | 'log'>('tasks');
+	let activeTab = $state<'tasks' | 'about' | 'calendar' | 'habits' | 'stats' | 'briefing' | 'focus' | 'log' | 'wall'>('tasks');
 	let stickyNotes = $state<string[]>(['Välkommen till din nya pärm! 📁', 'Klicka för att ändra mig...']);
 
 	let categories = $derived([...new Set(localTasks.map(t => t.category || 'Övrigt'))].sort());
@@ -146,6 +147,7 @@
 				{ id: 'stats', label: 'Statistik' },
 				{ id: 'briefing', label: 'Briefing' },
 				{ id: 'focus', label: 'Focus' },
+				{ id: 'wall', label: 'Väggen' },
 				{ id: 'log', label: 'Logg' },
 				{ id: 'about', label: 'Info' }
 			] as tab (tab.id)}
@@ -216,7 +218,7 @@
 						<div class="interactive-surface flex p-1">
 							{#each ['all', 'active', 'done'] as status (status)}
 								<button onclick={() => filterStatus = status as 'all' | 'active' | 'done'} class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all {filterStatus === status ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white' : 'opacity-50 hover:opacity-100'}">{status}</button>
-							{#/each}
+							{/each}
 						</div>
 					</div>
 
@@ -271,6 +273,10 @@
 				<div in:fade={{ duration: 300 }}>
 					<h3 class="text-[10px] font-black uppercase tracking-[0.25em] opacity-30 mb-8 ml-1">Fullständig Aktivitetslogg</h3>
 					<ActivityLog activities={data.activities} />
+				</div>
+			{:else if activeTab === 'wall'}
+				<div in:fade={{ duration: 300 }}>
+					<PostItWall bind:stickyNotes />
 				</div>
 			{:else}
 				<div in:fade={{ duration: 300 }}>
