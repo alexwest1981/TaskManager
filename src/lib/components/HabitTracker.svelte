@@ -10,6 +10,8 @@
 		history: Record<string, boolean>;
 	}
 
+	let { activeBinderId }: { activeBinderId: number } = $props();
+
 	let habits = $state<Habit[]>([
 		{ id: 'water', name: 'Dricka Vatten', icon: '💧', history: {} },
 		{ id: 'exercise', name: 'Träning', icon: '🏃', history: {} },
@@ -17,13 +19,14 @@
 		{ id: 'meditation', name: 'Meditation', icon: '🧘', history: {} }
 	]);
 
+	const storageKey = $derived(`habit_history_${activeBinderId}`);
+
 	onMount(() => {
-		const saved = localStorage.getItem('habit_history');
+		const saved = localStorage.getItem(storageKey);
 		if (saved) {
 			const parsed = JSON.parse(saved);
-			// Merge histories into local state
 			habits.forEach(h => {
-				if (parsed[h.id]) h.history = parsed[h.id];
+				h.history = parsed[h.id] || {};
 			});
 		}
 	});
@@ -33,7 +36,7 @@
 		habits.forEach(h => {
 			toSave[h.id] = h.history;
 		});
-		localStorage.setItem('habit_history', JSON.stringify(toSave));
+		localStorage.setItem(storageKey, JSON.stringify(toSave));
 	});
 
 	// Get last 7 days inclusive today

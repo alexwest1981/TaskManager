@@ -59,7 +59,7 @@
 				<div class="flex items-start gap-3">
 					<span class="text-sm">🗂️</span>
 					<div>
-						<h4 class="text-[12px] font-black leading-none">Multi-Binder</h4>
+						<h4 class="text-[12px] font-black leading-none">Multi-Binder <span class="text-green-500 ml-1">KLAR!</span></h4>
 						<p class="text-[10px] opacity-40 mt-1 uppercase tracking-tighter">Segmenterad lagring</p>
 					</div>
 				</div>

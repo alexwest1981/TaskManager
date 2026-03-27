@@ -11,14 +11,20 @@ export interface IXpService {
 const createXpService = (): IXpService => {
 	let totalXp = $state(0);
 	
+	const getActiveBinderId = () => {
+		if (!browser) return 1;
+		const match = document.cookie.match(/active_binder_id=(\d+)/);
+		return match ? parseInt(match[1], 10) : 1;
+	};
+
 	if (browser) {
-		const saved = localStorage.getItem('binder_xp');
+		const saved = localStorage.getItem(`binder_xp_${getActiveBinderId()}`);
 		if (saved) totalXp = parseInt(saved, 10);
 	}
 
 	const level = $derived(Math.floor(totalXp / 100) + 1);
 	const xpInCurrentLevel = $derived(totalXp % 100);
-	const progress = $derived(xpInCurrentLevel); // 0-100 since each level is 100 XP
+	const progress = $derived(xpInCurrentLevel);
 
 	return {
 		get totalXp() { return totalXp; },
@@ -28,7 +34,7 @@ const createXpService = (): IXpService => {
 		addXp(amount: number) {
 			totalXp += amount;
 			if (browser) {
-				localStorage.setItem('binder_xp', totalXp.toString());
+				localStorage.setItem(`binder_xp_${getActiveBinderId()}`, totalXp.toString());
 			}
 		}
 	};

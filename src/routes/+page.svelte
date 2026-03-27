@@ -14,6 +14,7 @@
 	import WeatherWidget from '$lib/components/WeatherWidget.svelte';
 	import StickyNote from '$lib/components/StickyNote.svelte';
 	import PostItWall from '$lib/components/PostItWall.svelte';
+	import BinderSwitcher from '$lib/components/BinderSwitcher.svelte';
 	import CalendarView from '$lib/components/CalendarView.svelte';
 	import PaperThemePicker from '$lib/components/PaperThemePicker.svelte';
 	import HabitTracker from '$lib/components/HabitTracker.svelte';
@@ -27,7 +28,14 @@
 	let paperTheme = $state('plain');
 	let binderTheme = $state('default');
 
-	let { data }: { data: { tasks: Task[], activities: Activity[] } } = $props();
+	interface PageData {
+		tasks: Task[];
+		activities: Activity[];
+		binders: { id: number; name: string; color: string }[];
+		activeBinderId: number;
+	}
+
+	let { data }: { data: PageData } = $props();
 	const flipDurationMs = 300;
 
 	let searchTerm = $state('');
@@ -48,13 +56,16 @@
 
 	$effect(() => { localTasks = data.tasks; });
 	
+	const stickyNotesKey = $derived(`sticky_notes_${data.activeBinderId}`);
+	
 	onMount(() => {
-		const saved = localStorage.getItem('sticky_notes');
+		const saved = localStorage.getItem(stickyNotesKey);
 		if (saved) stickyNotes = JSON.parse(saved);
+		else stickyNotes = ['Välkommen till din nya pärm! 📁', 'Klicka för att ändra mig...'];
 	});
 
 	$effect(() => {
-		localStorage.setItem('sticky_notes', JSON.stringify(stickyNotes));
+		localStorage.setItem(stickyNotesKey, JSON.stringify(stickyNotes));
 	});
 
 	let filteredTasks = $derived(
@@ -139,7 +150,12 @@
 	<div class="max-w-7xl mx-auto flex items-start">
 		
 		<!-- Left Side Tabs (Folder Labels) -->
-		<aside class="hidden lg:flex flex-col gap-0.5 pt-12 z-20 max-h-[90vh] overflow-y-auto no-scrollbar pr-0 relative mr-[-1px]">
+		<aside class="hidden lg:flex flex-col gap-0.5 pt-12 z-20 max-h-[90vh] overflow-y-auto no-scrollbar pr-1 relative mr-[-1px]">
+			<!-- Binder Shelf -->
+			<div class="px-2 mb-6">
+				<BinderSwitcher binders={data.binders} activeBinderId={data.activeBinderId} />
+			</div>
+
 			{#each [
 				{ id: 'tasks', label: 'Uppgifter' },
 				{ id: 'calendar', label: 'Kalender' },
@@ -240,7 +256,7 @@
 				</div>
 			{:else if activeTab === 'habits'}
 				<div in:fade={{ duration: 300 }}>
-					<HabitTracker />
+					<HabitTracker activeBinderId={data.activeBinderId} />
 				</div>
 			{:else if activeTab === 'stats'}
 				<div in:fade={{ duration: 300 }}>
