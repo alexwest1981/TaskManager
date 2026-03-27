@@ -175,7 +175,8 @@ body {
     background-color: var(--tab-inactive);
     position: relative;
     padding: 1rem 0;
-    margin-right: -1px; /* PIXEL PERFECT ATTACHMENT START */
+    margin-right: -1px; /* SUB-PIXEL OVERLAP */
+    z-index: 19;
 }
 
 .folder-tab-label {
