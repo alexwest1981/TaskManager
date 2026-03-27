@@ -161,7 +161,7 @@
 		</aside>
 
 		<!-- Main Page (Folder Content) -->
-		<main class="flex-1 folder-main p-6 md:p-10 min-h-[850px] z-10 relative {paperTheme !== 'plain' ? 'paper-' + paperTheme : ''}">
+		<main class="flex-1 folder-main p-6 md:p-10 min-h-[1000px] z-10 relative {paperTheme !== 'plain' ? 'paper-' + paperTheme : ''}">
 			<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 pb-6 border-b border-slate-100 dark:border-slate-800/50">
 				<div>
 					<h1 class="text-4xl text-bold-heavy tracking-tighter">TaskManager</h1>

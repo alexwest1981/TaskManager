@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { SvelteDate } from 'svelte/reactivity';
 
@@ -15,6 +16,25 @@
 		{ id: 'reading', name: 'Läsning', icon: '📚', history: {} },
 		{ id: 'meditation', name: 'Meditation', icon: '🧘', history: {} }
 	]);
+
+	onMount(() => {
+		const saved = localStorage.getItem('habit_history');
+		if (saved) {
+			const parsed = JSON.parse(saved);
+			// Merge histories into local state
+			habits.forEach(h => {
+				if (parsed[h.id]) h.history = parsed[h.id];
+			});
+		}
+	});
+
+	$effect(() => {
+		const toSave: Record<string, Record<string, boolean>> = {};
+		habits.forEach(h => {
+			toSave[h.id] = h.history;
+		});
+		localStorage.setItem('habit_history', JSON.stringify(toSave));
+	});
 
 	// Get last 7 days inclusive today
 	const days = $derived.by(() => {

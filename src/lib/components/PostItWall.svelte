@@ -37,7 +37,10 @@
 				<div class="flex justify-center">
 					<StickyNote 
 						{note} 
-						onUpdate={(val) => stickyNotes[i] = val} 
+						onUpdate={(val) => {
+							stickyNotes[i] = val;
+							stickyNotes = [...stickyNotes]; // Explicit trigger for parent $effect
+						}} 
 						onDelete={() => stickyNotes = stickyNotes.filter((_, idx) => idx !== i)} 
 					/>
 				</div>
