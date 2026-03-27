@@ -151,11 +151,6 @@
 		
 		<!-- Left Side Tabs (Folder Labels) -->
 		<aside class="hidden lg:flex flex-col gap-0.5 pt-12 z-20 max-h-[90vh] overflow-y-auto no-scrollbar pr-1 relative mr-[-1px]">
-			<!-- Binder Shelf -->
-			<div class="px-2 mb-6">
-				<BinderSwitcher binders={data.binders} activeBinderId={data.activeBinderId} />
-			</div>
-
 			{#each [
 				{ id: 'tasks', label: 'Uppgifter' },
 				{ id: 'calendar', label: 'Kalender' },
@@ -176,8 +171,12 @@
 			{/each}
 		</aside>
 
-		<!-- Main Page (Folder Content) -->
-		<main class="flex-1 folder-main p-6 md:p-10 min-h-[1000px] z-10 relative {paperTheme !== 'plain' ? 'paper-' + paperTheme : ''}">
+		<!-- Main Content Area -->
+		<main class="flex-1 min-h-[1000px] relative z-10">
+			<!-- Top Binder Tabs -->
+			<BinderSwitcher binders={data.binders} activeBinderId={data.activeBinderId} />
+
+			<div class="folder-main p-4 md:p-12 mb-8 {paperTheme !== 'plain' ? 'paper-' + paperTheme : ''}">
 			<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 pb-6 border-b border-slate-100 dark:border-slate-800/50">
 				<div>
 					<h1 class="text-4xl text-bold-heavy tracking-tighter">TaskManager</h1>
@@ -299,6 +298,7 @@
 					<AboutView onBack={() => activeTab = 'tasks'} />
 				</div>
 			{/if}
+			</div>
 		</main>
 
 		<!-- Activity & Sticky Notes Sidebar -->

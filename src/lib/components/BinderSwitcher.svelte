@@ -12,12 +12,20 @@
 	let newName = $state('');
 	let newColor = $state('blue');
 
+	const colorMap: Record<string, string> = {
+		blue: 'bg-blue-500',
+		green: 'bg-emerald-500',
+		red: 'bg-rose-500',
+		amber: 'bg-amber-500',
+		purple: 'bg-purple-500'
+	};
+
 	const colors = [
-		{ name: 'Blå', value: 'blue', bg: 'bg-blue-500' },
-		{ name: 'Grön', value: 'green', bg: 'bg-emerald-500' },
-		{ name: 'Röd', value: 'red', bg: 'bg-rose-500' },
-		{ name: 'Amber', value: 'amber', bg: 'bg-amber-500' },
-		{ name: 'Lila', value: 'purple', bg: 'bg-purple-500' }
+		{ name: 'Blå', value: 'blue' },
+		{ name: 'Grön', value: 'green' },
+		{ name: 'Röd', value: 'red' },
+		{ name: 'Amber', value: 'amber' },
+		{ name: 'Lila', value: 'purple' }
 	];
 
 	function switchBinder(id: number) {
@@ -26,57 +34,51 @@
 	}
 </script>
 
-<div class="mb-8">
-	<div class="flex flex-wrap gap-2 mb-4">
-		{#each binders as binder (binder.id)}
-			<button 
-				onclick={() => switchBinder(binder.id)}
-				class="group relative px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all
-				{activeBinderId === binder.id 
-					? 'bg-white dark:bg-slate-700 shadow-sm text-bold-heavy translate-y-[-2px]' 
-					: 'opacity-40 hover:opacity-100 hover:bg-white/50 dark:hover:bg-slate-800/50'}"
-			>
-				<div class="flex items-center gap-2">
-					<div class="w-1.5 h-1.5 rounded-full bg-{binder.color}-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-					{binder.name}
-				</div>
-				{#if activeBinderId === binder.id}
-					<div class="absolute -bottom-1 left-1.2 right-1.2 h-0.5 bg-{binder.color}-500 rounded-full"></div>
-				{/if}
-			</button>
-		{/each}
-		
+<div class="binder-tabs-container">
+	{#each binders as binder (binder.id)}
 		<button 
-			onclick={() => showAdd = !showAdd}
-			class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest opacity-30 hover:opacity-100 hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all"
+			onclick={() => switchBinder(binder.id)}
+			class="binder-tab {activeBinderId === binder.id ? 'binder-tab-active' : ''}"
 		>
-			+ Ny Pärm
+			<div class="w-1.5 h-1.5 rounded-full {colorMap[binder.color] || 'bg-slate-400'} shadow-sm"></div>
+			{binder.name}
 		</button>
-	</div>
+	{/each}
+	
+	<button 
+		onclick={() => showAdd = !showAdd}
+		class="binder-tab opacity-50 hover:opacity-100"
+	>
+		+
+	</button>
 
 	{#if showAdd}
-		<div in:fade={{ duration: 200 }} class="premium-card p-4 bg-white/50 dark:bg-slate-900/30 border-dashed border-2 border-slate-200 dark:border-slate-800">
+		<div in:fade={{ duration: 200 }} class="absolute top-12 left-0 z-50 premium-card p-4 min-w-[240px] shadow-2xl">
 			<form method="POST" action="?/addBinder" onsubmit={() => setTimeout(() => showAdd = false, 100)}>
+				<div class="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+					<span class="text-[9px] font-black uppercase tracking-[0.2em] opacity-40">Ny Pärm</span>
+					<button type="button" onclick={() => showAdd = false} class="opacity-20 hover:opacity-100">✕</button>
+				</div>
 				<input 
 					bind:value={newName}
 					name="name" 
-					placeholder="Pärmens namn..." 
-					class="w-full bg-transparent border-b border-slate-200 dark:border-slate-800 py-2 text-xs font-bold outline-none mb-3"
+					placeholder="Namn..." 
+					class="w-full bg-slate-50 dark:bg-slate-900 border-none rounded-lg py-2 px-3 text-xs font-bold outline-none mb-4"
 					required
 				/>
-				<div class="flex items-center justify-between mb-4">
+				<div class="flex items-center justify-between">
 					<div class="flex gap-2">
 						{#each colors as color (color.value)}
 							<button 
 								type="button"
 								aria-label="Välj färg: {color.name}"
 								onclick={() => newColor = color.value}
-								class="w-4 h-4 rounded-full {color.bg} transition-transform {newColor === color.value ? 'scale-125 ring-2 ring-offset-2 ring-slate-400' : 'opacity-60 hover:opacity-100'}"
+								class="w-4 h-4 rounded-full {colorMap[color.value]} transition-transform {newColor === color.value ? 'scale-125 ring-2 ring-offset-2 ring-slate-400' : 'opacity-60 hover:opacity-100'}"
 							></button>
 						{/each}
 						<input type="hidden" name="color" value={newColor} />
 					</div>
-					<button type="submit" class="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">Spara</button>
+					<button type="submit" class="premium-button py-1 px-3 text-[9px] uppercase tracking-widest">Spara</button>
 				</div>
 			</form>
 		</div>
