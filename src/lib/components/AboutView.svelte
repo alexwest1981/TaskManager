@@ -45,15 +45,15 @@
 				<div class="flex items-start gap-3">
 					<span class="text-sm">🎮</span>
 					<div>
-						<h4 class="text-[12px] font-black leading-none">Gamification & XP</h4>
+						<h4 class="text-[12px] font-black leading-none">Gamification & XP <span class="text-green-500 ml-1">KLAR!</span></h4>
 						<p class="text-[10px] opacity-40 mt-1 uppercase tracking-tighter">Leveling & Skins</p>
 					</div>
 				</div>
 				<div class="flex items-start gap-3">
 					<span class="text-sm">📌</span>
 					<div>
-						<h4 class="text-[12px] font-black leading-none">Post-it Väggen</h4>
-						<p class="text-[10px] opacity-40 mt-1 uppercase tracking-tighter">Free-form layout</p>
+						<h4 class="text-[12px] font-black leading-none">Post-it Väggen <span class="text-green-500 ml-1">NYTT!</span></h4>
+						<p class="text-[10px] opacity-40 mt-1 uppercase tracking-tighter">Dedikerad workspace</p>
 					</div>
 				</div>
 				<div class="flex items-start gap-3">
