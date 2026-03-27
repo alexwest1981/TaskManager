@@ -216,7 +216,7 @@
 						<div class="interactive-surface flex p-1">
 							{#each ['all', 'active', 'done'] as status (status)}
 								<button onclick={() => filterStatus = status as 'all' | 'active' | 'done'} class="flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all {filterStatus === status ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-white' : 'opacity-50 hover:opacity-100'}">{status}</button>
-							{/each}
+							{#/each}
 						</div>
 					</div>
 
@@ -349,6 +349,17 @@
 	onExport={() => exportTasks(localTasks)}
 	onImport={handleImport}
 />
+
+{#if showLevelUp}
+	<div 
+		transition:fade 
+		class="fixed top-10 left-1/2 -translate-x-1/2 z-[100] bg-amber-500 text-white px-8 py-4 rounded-2xl shadow-2xl border-4 border-white/20 animate-bounce flex flex-col items-center gap-1"
+	>
+		<span class="text-[10px] font-black uppercase tracking-widest opacity-80">Bra jobbat!</span>
+		<h2 class="text-2xl font-black tracking-tighter">NIVÅ UPP! 🎉</h2>
+		<span class="text-sm font-bold">Du är nu nivå {xpService.level}</span>
+	</div>
+{/if}
 
 <style>
 	:global(body) { overflow-x: hidden; }
