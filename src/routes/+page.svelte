@@ -18,6 +18,7 @@
 	import HabitTracker from '$lib/components/HabitTracker.svelte';
 	import AIBriefing from '$lib/components/AIBriefing.svelte';
 	import PomodoroTimer from '$lib/components/PomodoroTimer.svelte';
+	import { xpService } from '$lib/xp.svelte';
 	import type { Task, Activity } from '$lib/types';
 	import { exportTasks, importTasks } from '$lib/utils/tasks';
 
@@ -112,6 +113,17 @@
 		const saved = localStorage.getItem('theme');
 		isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
 		applyTheme();
+	});
+
+	let lastLevel = $state(xpService.level);
+	let showLevelUp = $state(false);
+
+	$effect(() => {
+		if (xpService.level > lastLevel) {
+			showLevelUp = true;
+			setTimeout(() => { showLevelUp = false; }, 3000);
+			lastLevel = xpService.level;
+		}
 	});
 
 	async function handleImport(e: Event) {
@@ -305,6 +317,27 @@
 					<div class="bg-blue-600 h-full transition-all duration-1000 ease-out" style="width: {progress}%"></div>
 				</div>
 				<p class="text-[9px] font-black uppercase tracking-widest opacity-30">{completed} av {total} avklarade</p>
+			</div>
+
+			<div class="premium-card p-6 border-l-4 border-l-amber-500 shadow-xl bg-linear-to-br from-amber-50/50 to-transparent dark:from-amber-900/5">
+				<div class="flex justify-between items-center mb-4">
+					<h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400">Binder Level</h3>
+					<span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-500 text-white">LVL {xpService.level}</span>
+				</div>
+				<div class="relative h-4 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-amber-200/20">
+					<div 
+						class="absolute inset-x-0 h-full bg-linear-to-r from-amber-400 to-amber-600 transition-all duration-500 ease-out" 
+						style="width: {xpService.progress}%"
+					></div>
+					<div class="absolute inset-0 flex items-center justify-center">
+						<span class="text-[8px] font-black text-amber-950/40 dark:text-white/40 uppercase tracking-widest">
+							{xpService.progress} / 100 XP
+						</span>
+					</div>
+				</div>
+				<p class="text-[8px] font-bold opacity-40 mt-3 text-center uppercase tracking-widest">
+					{xpService.xpToNextLevel} XP kvar till nästa nivå
+				</p>
 			</div>
 		</aside>
 	</div>

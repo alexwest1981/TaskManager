@@ -38,6 +38,40 @@
 				<p class="flex items-center gap-3"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 🎙️ Röstinmatning & Väder-insikter</p>
 			</div>
 		</article>
+
+		<article class="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-dotted border-slate-200 dark:border-slate-800">
+			<h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-6">Roadmap 2026</h3>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+				<div class="flex items-start gap-3">
+					<span class="text-sm">🎮</span>
+					<div>
+						<h4 class="text-[12px] font-black leading-none">Gamification & XP</h4>
+						<p class="text-[10px] opacity-40 mt-1 uppercase tracking-tighter">Leveling & Skins</p>
+					</div>
+				</div>
+				<div class="flex items-start gap-3">
+					<span class="text-sm">📌</span>
+					<div>
+						<h4 class="text-[12px] font-black leading-none">Post-it Väggen</h4>
+						<p class="text-[10px] opacity-40 mt-1 uppercase tracking-tighter">Free-form layout</p>
+					</div>
+				</div>
+				<div class="flex items-start gap-3">
+					<span class="text-sm">🗂️</span>
+					<div>
+						<h4 class="text-[12px] font-black leading-none">Multi-Binder</h4>
+						<p class="text-[10px] opacity-40 mt-1 uppercase tracking-tighter">Segmenterad lagring</p>
+					</div>
+				</div>
+				<div class="flex items-start gap-3">
+					<span class="text-sm">🎵</span>
+					<div>
+						<h4 class="text-[12px] font-black leading-none">Ambient Focus</h4>
+						<p class="text-[10px] opacity-40 mt-1 uppercase tracking-tighter">Lo-Fi Soundscapes</p>
+					</div>
+				</div>
+			</div>
+		</article>
 	</div>
 
 	<div class="mt-auto pt-12 text-center">

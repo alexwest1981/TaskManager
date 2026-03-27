@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Task } from '$lib/types';
 	import { enhance } from '$app/forms';
+	import { xpService } from '$lib/xp.svelte';
 
 	let { task }: { task: Task } = $props();
 
@@ -41,7 +42,11 @@
 	}
 
 	function onCheck(event: Event) {
-		const form = (event.target as HTMLInputElement).form;
+		const checkbox = event.target as HTMLInputElement;
+		if (checkbox.checked && !task.done) {
+			xpService.addXp(10);
+		}
+		const form = checkbox.form;
 		if (form) form.requestSubmit();
 	}
 
