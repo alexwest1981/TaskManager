@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
+	import AmbientMixer from './AmbientMixer.svelte';
 
 	let timeLeft = $state(25 * 60); // 25 minutes
 	let isRunning = $state(false);
@@ -110,4 +111,6 @@
 			Reset
 		</button>
 	</div>
+
+	<AmbientMixer />
 </div>
