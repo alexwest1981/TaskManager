@@ -11,8 +11,6 @@
 	import StatsModal from '$lib/components/StatsModal.svelte';
 	import AboutView from '$lib/components/AboutView.svelte';
 	import ActivityLog from '$lib/components/ActivityLog.svelte';
-	import WeatherWidget from '$lib/components/WeatherWidget.svelte';
-	import StickyNote from '$lib/components/StickyNote.svelte';
 	import PostItWall from '$lib/components/PostItWall.svelte';
 	import BinderSwitcher from '$lib/components/BinderSwitcher.svelte';
 	import CalendarView from '$lib/components/CalendarView.svelte';
@@ -149,30 +147,8 @@
 <div class="min-h-screen pt-10 pb-20 px-4 md:px-8 transition-colors duration-500 {binderTheme !== 'default' ? 'binder-' + binderTheme : ''}">
 	<div class="max-w-7xl mx-auto flex items-start">
 		
-		<!-- Left Side Tabs (Folder Labels) -->
-		<aside class="hidden lg:flex flex-col gap-0.5 pt-12 z-20 w-[60px] flex-shrink-0 relative">
-			{#each [
-				{ id: 'tasks', label: 'Uppgifter' },
-				{ id: 'calendar', label: 'Kalender' },
-				{ id: 'habits', label: 'Vanor' },
-				{ id: 'stats', label: 'Statistik' },
-				{ id: 'briefing', label: 'Briefing' },
-				{ id: 'focus', label: 'Focus' },
-				{ id: 'wall', label: 'Väggen' },
-				{ id: 'log', label: 'Logg' },
-				{ id: 'about', label: 'Info' }
-			] as tab (tab.id)}
-				<button 
-					onclick={() => activeTab = tab.id as typeof activeTab}
-					class="folder-tab {activeTab === tab.id ? 'folder-tab-active' : 'folder-tab-inactive'}"
-				>
-					<span class="folder-tab-label">{tab.label}</span>
-				</button>
-			{/each}
-		</aside>
-
 		<!-- Main Content Area -->
-		<main class="flex-1 relative z-10 -ml-[1px]">
+		<main class="flex-1 relative z-10">
 			<!-- Top Binder Tabs -->
 			<BinderSwitcher binders={data.binders} activeBinderId={data.activeBinderId} />
 
@@ -301,34 +277,30 @@
 			</div>
 		</main>
 
-		<!-- Activity & Sticky Notes Sidebar -->
-		<aside class="hidden xl:flex flex-col gap-16 w-80 sticky top-10 ml-16">
-			<WeatherWidget />
+		<!-- Right Side Tabs (Folder Labels) -->
+		<aside class="hidden lg:flex flex-col gap-0.5 pt-12 z-20 w-[60px] flex-shrink-0 relative">
+			{#each [
+				{ id: 'tasks', label: 'Uppgifter' },
+				{ id: 'calendar', label: 'Kalender' },
+				{ id: 'habits', label: 'Vanor' },
+				{ id: 'stats', label: 'Statistik' },
+				{ id: 'briefing', label: 'Briefing' },
+				{ id: 'focus', label: 'Focus' },
+				{ id: 'wall', label: 'Väggen' },
+				{ id: 'log', label: 'Logg' },
+				{ id: 'about', label: 'Info' }
+			] as tab (tab.id)}
+				<button 
+					onclick={() => activeTab = tab.id as typeof activeTab}
+					class="folder-tab {activeTab === tab.id ? 'folder-tab-active' : 'folder-tab-inactive'}"
+				>
+					<span class="folder-tab-label">{tab.label}</span>
+				</button>
+			{/each}
+		</aside>
 
-			<div>
-				<div class="flex justify-between items-center mb-6 px-1">
-					<h3 class="text-[10px] font-black uppercase tracking-[0.25em] opacity-30 flex items-center gap-2">
-						Sticky Notes
-					</h3>
-					<button 
-						onclick={() => stickyNotes = [...stickyNotes, '']}
-						class="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center text-[10px] font-black hover:scale-110 transition-transform shadow-sm"
-					>
-						+
-					</button>
-				</div>
-				
-				<div class="space-y-6">
-					{#each stickyNotes as note, i (i)}
-						<StickyNote 
-							{note} 
-							onUpdate={(val) => stickyNotes[i] = val} 
-							onDelete={() => stickyNotes = stickyNotes.filter((_, idx) => idx !== i)} 
-						/>
-					{/each}
-				</div>
-			</div>
-
+		<!-- Widgets Sidebar -->
+		<aside class="hidden xl:flex flex-col gap-12 w-80 sticky top-10 ml-12">
 			<div class="premium-card p-6 border-l-4 border-l-blue-600 shadow-xl opacity-90">
 				<h3 class="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 mb-4">Mål-uppfyllnad</h3>
 				<div class="flex items-baseline gap-1 mb-2">

@@ -169,19 +169,19 @@ body {
     min-height: 5rem; width: 3.5rem;
     display: flex; align-items: center; justify-content: center;
     border: 1px solid var(--folder-border);
-    border-right: none;
-    border-radius: 1.25rem 0 0 1.25rem;
+    border-left: none; /* ATTACH TO LEFT */
+    border-radius: 0 1.25rem 1.25rem 0; /* ROUNDED RIGHT */
     transition: all 0.2s ease; cursor: pointer;
     background-color: var(--tab-inactive);
     position: relative;
     padding: 1rem 0;
-    margin-right: -1px; /* SUB-PIXEL OVERLAP */
+    margin-left: -2px; /* OVERLAP LEFT */
     z-index: 19;
 }
 
 .folder-tab-label {
     writing-mode: vertical-lr;
-    transform: rotate(180deg);
+    transform: rotate(0deg); /* NO ROTATION NEEDED ON RIGHT SIDE FOR BOTTOM-TOP READING */
     display: inline-block;
     font-size: 0.7rem;
     font-weight: 900;
@@ -194,11 +194,11 @@ body {
 .folder-tab-active {
     background-color: var(--folder-bg) !important;
     border-color: var(--folder-border) !important;
-    border-right: 1px solid var(--folder-bg) !important; /* SURGICAL MASK V12 */
+    border-left: 1px solid var(--folder-bg) !important; /* MASK LEFT */
     z-index: 100 !important;
     width: 3.7rem;
-    margin-right: -2px !important; 
-    box-shadow: -2px 0 8px rgba(0,0,0,0.05); /* NATURAL DEPTH */
+    margin-left: -4px !important; 
+    box-shadow: 2px 0 8px rgba(0,0,0,0.05); /* DEPTH RIGHT */
 }
 
 .folder-tab-active .folder-tab-label {
@@ -210,7 +210,7 @@ body {
 }
 
 .folder-tab-active::after {
-    content: ''; position: absolute; right: -2px; top: 0; bottom: 0; width: 4px;
+    content: ''; position: absolute; left: -2px; top: 0; bottom: 0; width: 4px;
     background-color: var(--folder-bg); z-index: 101;
 }
 
