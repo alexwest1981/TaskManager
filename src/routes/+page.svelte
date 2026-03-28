@@ -241,6 +241,7 @@
 						{completed} 
 						{stats} 
 						{timeAgo} 
+						activities={data.activities}
 						onExport={() => exportTasks(localTasks)} 
 						onImport={async (e) => {
 							const target = e.target as HTMLInputElement;

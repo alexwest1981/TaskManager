@@ -47,58 +47,38 @@ body {
 /* --- REUSABLE SEMANTIC CLASSES --- */
 
 .folder-main {
-    background-color: var(--folder-bg);
+    background-color: var(--binder-bg, var(--folder-bg));
+    background-image: var(--binder-texture, none);
     border: 1px solid var(--folder-border);
-    border-radius: 1.5rem; /* RESTORED ROUNDING */
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    border-radius: 1.5rem;
+    box-shadow: var(--binder-shadow, inset 0 0 50px rgba(0,0,0,0.05)), 0 20px 25px -5px rgb(0 0 0 / 0.1);
     position: relative;
     color: var(--text-primary) !important;
+    transition: background 0.5s ease, box-shadow 0.5s ease;
 }
 
-/* --- THEMATIC PATTERNS (POWER PACK) --- */
+/* --- THEMATIC PATTERNS (Skins Library) --- */
 
-/* Paper: Ruled (Linjerat) */
-.paper-ruled {
-    background-image: linear-gradient(var(--folder-border) 1px, transparent 1px);
-    background-size: 100% 2.5rem;
-    background-position: 0 1.5rem;
-}
-
-/* Paper: Graphed (Rutat) */
-.paper-grid {
-    background-image: 
-        linear-gradient(var(--folder-border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--folder-border) 1px, transparent 1px);
-    background-size: 2.5rem 2.5rem;
-}
-
-/* Binder: Leather Skin */
-.binder-leather {
-    background-color: #2d1b14;
-    background-image: 
+:root {
+    --skin-leather-bg: #2d1b14;
+    --skin-leather-texture: 
         radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0),
         repeating-linear-gradient(45deg, rgba(0,0,0,0.1) 0, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 4px);
-    box-shadow: inset 0 0 100px rgba(0,0,0,0.5), var(--card-shadow);
-}
+    --skin-leather-shadow: inset 0 0 100px rgba(0,0,0,0.5);
 
-/* Binder: Carbon Fiber */
-.binder-carbon {
-    background: 
+    --skin-carbon-bg: #1a1a1a;
+    --skin-carbon-texture: 
         linear-gradient(45deg, #111 25%, transparent 25%),
         linear-gradient(-45deg, #111 25%, transparent 25%),
         linear-gradient(45deg, transparent 75%, #111 75%),
         linear-gradient(-45deg, transparent 75%, #111 75%);
-    background-size: 10px 10px;
-    background-color: #1a1a1a;
-    box-shadow: inset 0 0 50px rgba(0,0,0,0.3);
-}
+    --skin-carbon-shadow: inset 0 0 50px rgba(0,0,0,0.3);
 
-/* Binder: Premium Fabric */
-.binder-fabric {
-    background-color: #334155;
-    background-image: 
-        repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 2px),
-        repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 2px);
+    --skin-marble-bg: #f8fafc;
+    --skin-marble-texture: 
+        linear-gradient(125deg, rgba(255,255,255,0.7) 0%, rgba(200,200,200,0.1) 50%, rgba(255,255,255,0.7) 100%),
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 20px);
+    --skin-marble-shadow: inset 0 0 30px rgba(0,0,0,0.02);
 }
 
 /* Task Item / Activity Log / Any Card Box */
