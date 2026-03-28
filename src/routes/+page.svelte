@@ -11,6 +11,7 @@
 	import StatsModal from '$lib/components/StatsModal.svelte';
 	import AboutView from '$lib/components/AboutView.svelte';
 	import ActivityLog from '$lib/components/ActivityLog.svelte';
+	import WeatherWidget from '$lib/components/WeatherWidget.svelte';
 	import PostItWall from '$lib/components/PostItWall.svelte';
 	import BinderSwitcher from '$lib/components/BinderSwitcher.svelte';
 	import CalendarView from '$lib/components/CalendarView.svelte';
@@ -301,6 +302,8 @@
 
 		<!-- Widgets Sidebar -->
 		<aside class="hidden xl:flex flex-col gap-12 w-80 sticky top-10 ml-12">
+			<WeatherWidget />
+
 			<div class="premium-card p-6 border-l-4 border-l-blue-600 shadow-xl opacity-90">
 				<h3 class="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 mb-4">Mål-uppfyllnad</h3>
 				<div class="flex items-baseline gap-1 mb-2">
