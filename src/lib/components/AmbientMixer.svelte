@@ -16,6 +16,8 @@
 		{ id: 'white', label: 'Brus', icon: '🌫️', volume: 0 }
 	]);
 
+	let isMasterOn = $state(false);
+
 	onMount(() => {
 		// Load from localStorage
 		const savedVolumes = JSON.parse(localStorage.getItem('ambient_volumes') || '{}');
@@ -24,19 +26,24 @@
 			volume: savedVolumes[s.id] ?? 0
 		}));
 
-		// Initialize volumes
-		sounds.forEach(s => {
-			if (s.volume > 0) {
-				audioEngine.setVolume(s.id, s.volume);
-			}
-		});
+		// Check initial state
+		isMasterOn = audioEngine.isMuted === false;
 	});
+
+	async function handleToggleMaster() {
+		await audioEngine.toggleMaster();
+		isMasterOn = !audioEngine.isMuted;
+	}
 
 	function updateVolume(id: string, newVol: number) {
 		const sound = sounds.find(s => s.id === id);
 		if (sound) {
 			sound.volume = newVol;
 			audioEngine.setVolume(id, newVol);
+			
+			// If we turn up air, and it's muted, we should probably stay muted until master is on?
+			// Actually, let's keep it simple: if you move a slider, you want sound. 
+			// But the user asked for a master switch.
 			
 			// Save to localStorage
 			const savedVolumes = JSON.parse(localStorage.getItem('ambient_volumes') || '{}');
@@ -47,9 +54,20 @@
 </script>
 
 <div class="mt-10 pt-8 border-t border-slate-100 dark:border-slate-800/50 w-full max-w-xs mx-auto">
-	<h4 class="text-[9px] font-black uppercase tracking-[0.25em] mb-6 opacity-30 text-center">Ambient Mixer</h4>
+	<div class="flex items-center justify-between mb-8">
+		<h4 class="text-[9px] font-black uppercase tracking-[0.25em] opacity-30">Ambient Mixer</h4>
+		<button 
+			onclick={handleToggleMaster}
+			class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all group"
+		>
+			<span class="text-[9px] font-black uppercase tracking-widest {isMasterOn ? 'text-blue-600' : 'text-rose-500'}">
+				{isMasterOn ? 'Pausa' : 'Spela'}
+			</span>
+			<span class="text-xs group-active:scale-90 transition-transform">{isMasterOn ? '🔈' : '🔇'}</span>
+		</button>
+	</div>
 	
-	<div class="space-y-6">
+	<div class="space-y-6 {isMasterOn ? '' : 'opacity-40 pointer-events-none grayscale-[0.5] transition-all'}">
 		{#each sounds as sound (sound.id)}
 			<div class="flex items-center gap-4 group">
 				<div 

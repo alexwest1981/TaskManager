@@ -37,11 +37,6 @@ export class AudioEngine {
 		this.init();
 		if (!this.ctx) return;
 
-		// Explicitly resume context for Brave/Chrome policy
-		if (this.ctx.state === 'suspended') {
-			this.ctx.resume();
-		}
-
 		if (volume === 0) {
 			this.stop(id);
 			return;
@@ -55,6 +50,20 @@ export class AudioEngine {
 		if (node) {
 			node.gain.gain.setTargetAtTime(volume / 100, this.ctx.currentTime, 0.1);
 		}
+	}
+
+	public async toggleMaster() {
+		this.init();
+		if (!this.ctx) return;
+		if (this.ctx.state === 'running') {
+			await this.ctx.suspend();
+		} else {
+			await this.ctx.resume();
+		}
+	}
+
+	public get isMuted() {
+		return this.ctx?.state !== 'running';
 	}
 
 	private play(id: string) {
