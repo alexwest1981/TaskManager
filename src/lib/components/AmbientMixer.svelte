@@ -1,20 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { audioEngine } from '$lib/audioEngine';
 
 	interface Sound {
 		id: string;
 		label: string;
 		icon: string;
-		url: string;
 		volume: number;
-		audio?: HTMLAudioElement;
 	}
 
 	let sounds = $state<Sound[]>([
-		{ id: 'rain', label: 'Regn', icon: '🌧️', url: 'https://cdn.pixabay.com/audio/2021/09/06/audio_9467664e40.mp3', volume: 0 },
-		{ id: 'forest', label: 'Skog', icon: '🌲', url: 'https://cdn.pixabay.com/audio/2022/02/13/audio_73147f897f.mp3', volume: 0 },
-		{ id: 'cafe', label: 'Kafé', icon: '☕', url: 'https://cdn.pixabay.com/audio/2022/03/10/audio_27607a974d.mp3', volume: 0 },
-		{ id: 'white', label: 'Brus', icon: '🌫️', url: 'https://www.soundjay.com/misc/sounds/white-noise-01.mp3', volume: 0 }
+		{ id: 'rain', label: 'Regn', icon: '🌧️', volume: 0 },
+		{ id: 'forest', label: 'Skog', icon: '🌲', volume: 0 },
+		{ id: 'cafe', label: 'Kafé', icon: '☕', volume: 0 },
+		{ id: 'white', label: 'Brus', icon: '🌫️', volume: 0 }
 	]);
 
 	onMount(() => {
@@ -25,30 +24,19 @@
 			volume: savedVolumes[s.id] ?? 0
 		}));
 
-		// Initialize audio objects
+		// Initialize volumes
 		sounds.forEach(s => {
-			s.audio = new Audio(s.url);
-			s.audio.loop = true;
 			if (s.volume > 0) {
-				s.audio.volume = s.volume / 100;
-				s.audio.play().catch(() => {
-					// Autoplay might be blocked until user interaction
-					console.log('Autoplay blocked for', s.id);
-				});
+				audioEngine.setVolume(s.id, s.volume);
 			}
 		});
 	});
 
 	function updateVolume(id: string, newVol: number) {
 		const sound = sounds.find(s => s.id === id);
-		if (sound && sound.audio) {
+		if (sound) {
 			sound.volume = newVol;
-			sound.audio.volume = newVol / 100;
-			if (newVol > 0 && sound.audio.paused) {
-				sound.audio.play();
-			} else if (newVol === 0 && !sound.audio.paused) {
-				sound.audio.pause();
-			}
+			audioEngine.setVolume(id, newVol);
 			
 			// Save to localStorage
 			const savedVolumes = JSON.parse(localStorage.getItem('ambient_volumes') || '{}');
