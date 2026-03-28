@@ -32,17 +32,42 @@
 		document.cookie = `active_binder_id=${id}; path=/; max-age=31536000`;
 		window.location.reload();
 	}
+
+	let confirmingDelete = $state<number | null>(null);
 </script>
 
 <div class="binder-tabs-container">
 	{#each binders as binder (binder.id)}
-		<button 
-			onclick={() => switchBinder(binder.id)}
-			class="binder-tab {activeBinderId === binder.id ? 'binder-tab-active' : ''}"
-		>
-			<div class="w-1.5 h-1.5 rounded-full {colorMap[binder.color] || 'bg-slate-400'} shadow-sm"></div>
-			{binder.name}
-		</button>
+		<div class="relative group/binder">
+			<button 
+				onclick={() => {
+					if (confirmingDelete === binder.id) return;
+					switchBinder(binder.id);
+				}}
+				class="binder-tab {activeBinderId === binder.id ? 'binder-tab-active' : ''}"
+			>
+				<div class="w-1.5 h-1.5 rounded-full {colorMap[binder.color] || 'bg-slate-400'} shadow-sm"></div>
+				{binder.name}
+			</button>
+
+			{#if binders.length > 1}
+				{#if confirmingDelete === binder.id}
+					<form method="POST" action="?/deleteBinder" class="absolute -top-3 left-1/2 -translate-x-1/2 z-[100] flex gap-1 whitespace-nowrap bg-white dark:bg-slate-800 p-1 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700">
+						<input type="hidden" name="id" value={binder.id} />
+						<button type="submit" class="bg-rose-500 text-white text-[9px] font-black py-1 px-2 rounded hover:bg-rose-600 transition-colors uppercase">Radera?</button>
+						<button type="button" onclick={() => confirmingDelete = null} class="bg-slate-500 text-white text-[9px] font-black py-1 px-2 rounded hover:bg-slate-600 transition-colors uppercase">Nej</button>
+					</form>
+				{:else}
+					<button 
+						onclick={() => confirmingDelete = binder.id}
+						class="absolute -top-2 -right-2 hidden group-hover/binder:flex w-5 h-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full items-center justify-center text-[10px] opacity-60 hover:opacity-100 hover:text-rose-500 z-50 transition-all shadow-md group-active/binder:flex"
+						title="Ta bort pärm"
+					>
+						✕
+					</button>
+				{/if}
+			{/if}
+		</div>
 	{/each}
 	
 	<button 

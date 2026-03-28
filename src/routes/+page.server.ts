@@ -23,8 +23,9 @@ export const load = async ({ cookies }) => {
 			binders: allBinders,
 			activeBinderId: binderId
 		};
-	} catch (e: any) {
-		appendFileSync('/tmp/error.log', `LOAD ERROR: ${e.message}\n${e.stack}\n`);
+	} catch (e: unknown) {
+		const msg = e instanceof Error ? e.message : String(e);
+		appendFileSync('/tmp/error.log', `LOAD ERROR: ${msg}\n`);
 		throw e;
 	}
 };
@@ -59,7 +60,7 @@ export const actions = {
 				text, 
 				createdAt: Date.now(), 
 				updatedAt: Date.now(),
-				priority: priority as any,
+				priority: priority as 'low' | 'medium' | 'high',
 				category,
 				dueDate
 			});
@@ -100,7 +101,7 @@ export const actions = {
 		if (text) {
 			await db.update(tasks).set({ 
 				text, 
-				priority: priority as any, 
+				priority: priority as 'low' | 'medium' | 'high', 
 				category, 
 				updatedAt: Date.now() 
 			}).where(and(eq(tasks.id, id), eq(tasks.binderId, binderId)));
@@ -126,5 +127,29 @@ export const actions = {
 		if (name) {
 			await db.insert(binders).values({ name, color, createdAt: Date.now() });
 		}
+	},
+	deleteBinder: async ({ request, cookies }) => {
+		const data = await request.formData();
+		const id = Number(data.get('id'));
+		const activeId = Number(cookies.get('active_binder_id') || '1');
+
+		// 1. Safety check: Count binders
+		const all = await db.select().from(binders);
+		if (all.length <= 1) return { error: 'Kan inte ta bort den sista pärmen.' };
+
+		// 2. Cascading delete (manual due to schema)
+		await db.delete(activities).where(eq(activities.binderId, id));
+		await db.delete(tasks).where(eq(tasks.binderId, id));
+		await db.delete(binders).where(eq(binders.id, id));
+
+		// 3. Cookie management
+		if (id === activeId) {
+			const remaining = await db.select().from(binders).limit(1);
+			if (remaining.length > 0) {
+				cookies.set('active_binder_id', remaining[0].id.toString(), { path: '/', maxAge: 31536000 });
+			}
+		}
+
+		return { success: true };
 	}
 };
