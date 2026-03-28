@@ -8,6 +8,7 @@
 		bg: string;
 		texture: string;
 		shadow: string;
+		text: string;
 	}
 
 	const skins: Skin[] = [
@@ -17,7 +18,8 @@
 			icon: '📘', 
 			bg: 'var(--folder-bg)', 
 			texture: 'none', 
-			shadow: 'inset 0 0 50px rgba(0,0,0,0.05)' 
+			shadow: 'inset 0 0 50px rgba(0,0,0,0.05)',
+			text: 'var(--text-primary)'
 		},
 		{ 
 			id: 'leather', 
@@ -25,7 +27,8 @@
 			icon: '💼', 
 			bg: 'var(--skin-leather-bg)', 
 			texture: 'var(--skin-leather-texture)', 
-			shadow: 'var(--skin-leather-shadow)' 
+			shadow: 'var(--skin-leather-shadow)',
+			text: '#f8fafc' // Force light on dark leather
 		},
 		{ 
 			id: 'carbon', 
@@ -33,7 +36,8 @@
 			icon: '🌑', 
 			bg: 'var(--skin-carbon-bg)', 
 			texture: 'var(--skin-carbon-texture)', 
-			shadow: 'var(--skin-carbon-shadow)' 
+			shadow: 'var(--skin-carbon-shadow)',
+			text: '#f8fafc' // Force light on obsidian
 		},
 		{ 
 			id: 'marble', 
@@ -41,7 +45,8 @@
 			icon: '🏛️', 
 			bg: 'var(--skin-marble-bg)', 
 			texture: 'var(--skin-marble-texture)', 
-			shadow: 'var(--skin-marble-shadow)' 
+			shadow: 'var(--skin-marble-shadow)',
+			text: '#020617' // FORCE DARK ON WHITE MARBLE
 		}
 	];
 
@@ -62,6 +67,7 @@
 		root.style.setProperty('--binder-bg', skin.bg);
 		root.style.setProperty('--binder-texture', skin.texture);
 		root.style.setProperty('--binder-shadow', skin.shadow);
+		root.style.setProperty('--binder-text', skin.text);
 		
 		localStorage.setItem('binder_skin', id);
 	}
